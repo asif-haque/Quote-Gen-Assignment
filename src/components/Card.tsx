@@ -1,14 +1,54 @@
-import React from "react";
+import { useEffect, useState } from "react";
+import {
+  FaBookmark,
+  FaQuoteLeft,
+  FaQuoteRight,
+  FaRegBookmark,
+} from "react-icons/fa";
+import { useBookmarksContext } from "../contexts/BookmarksContext";
 
-const Card = () => {
+interface CardPropsType {
+  data: string;
+  bookmarked?: boolean;
+}
+
+const Card: React.FC<CardPropsType> = ({ data, bookmarked = false }) => {
+  const [isBookmarked, setIsBookmarked] = useState<boolean>(bookmarked);
+  const { bookmarks, setBookmarks } = useBookmarksContext();
+
+  useEffect(() => {
+    bookmarks.forEach((el) => {
+      if (el.data === data) {
+        setIsBookmarked(true);
+      }
+    });
+  }, []);
+
+  const handleBookmark = () => {
+    setIsBookmarked(!isBookmarked);
+
+    if (!isBookmarked) {
+      // add to bookmark
+      setBookmarks([...bookmarks, { data, bookmarked: true }]);
+    } else {
+      // remove
+      setBookmarks((prevBookmarks) =>
+        prevBookmarks.filter((el) => el.data !== data)
+      );
+    }
+  };
+
   return (
-    <div className="bg-neutral-100 w-[300px] p-5 rounded-lg">
-      <div className="border-b">
-        Lorem ipsum dolor sit amet consectetur adipisicing elit. Quod tempora
-        esse at ut praesentium quasi.
+    <div className="hover:shadow-lg hover:translate-y-1 duration-500 cursor-pointer bg-neutral-100 border w-[300px] h-fit p-4 rounded-lg space-y-3">
+      <div className="flex justify-center gap-3 text-neutral-700">
+        <FaQuoteLeft />
+        <FaQuoteRight />
       </div>
-      <div className="flex">
-        <span className="ml-auto">Bookmark</span>
+      <div className="">{data}</div>
+      <div className="flex border-t border-black/15 pt-2">
+        <button className="ml-auto text-2xl" onClick={handleBookmark}>
+          {isBookmarked ? <FaBookmark /> : <FaRegBookmark />}
+        </button>
       </div>
     </div>
   );
